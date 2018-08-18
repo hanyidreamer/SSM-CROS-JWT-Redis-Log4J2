@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:property-placeholder
+            location="classpath:config.properties"/>
+
+
+    <!-- SpringContextHolder注入ApplicationContext，需要实现ApplicationContextAware -->
+    <bean class="com.demo.utils.SpringContextHolder"/>
+
+
+    <!-- 全局自动扫描与装配bean -->
+    <context:component-scan base-package="com.demo.service"><!-- base-package + 如果多个，用“,”分隔 -->
+        <!-- 使用Annotation自动注册Bean，解决事物失效问题：在主容器中不扫描@Controller注解，在SpringMvc中只扫描@Controller注解。 -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <bean id="cacheExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 线程池维护线程的核心数量 -->
+        <property name="corePoolSize" value="2"/>
+        <!-- 线程池维护线程的最大数量 -->
+        <property name="maxPoolSize" value="4"/>
+        <!-- 缓存队列 -->
+        <property name="queueCapacity" value="64"/>
+        <!-- 线程池的名称 -->
+        <property name="threadNamePrefix" value="CACHE_DISTANCE"/>
+        <!-- 对拒绝task的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor.AbortPolicy"/>
+        </property>
+    </bean>
+
+    <!-- 引用spring子模块 -->
+    <import resource="spring-mybatis.xml"/>
+
+</beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="1800">
+
+    <Properties> <!-- 配置日志文件输出目录，此配置将日志输出到tomcat根目录下的指定文件夹 -->
+        <Property name="LOG_HOME">${sys:catalina.home}/logs
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!--输出日志的格式 -->
+            <PatternLayout pattern="%-5level %d{yyyy-MM-dd HH:mm:ss,SSS}  %c.%M(%L) | %msg%xEx%n"/>
+        </Console>
+        <RollingRandomAccessFile name="trace_appender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/demo/Console.log"
+                                 filePattern="${LOG_HOME}/Console/Console - %d{yyyy-MM-dd HH_mm_ss}.log.gz">
+            <PatternLayout>
+                <pattern>%-5level %d{yyyy-MM-dd HH:mm:ss,SSS} %c.%M(%L) | %msg%xEx%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="2MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="error">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="trace_appender"/>
+        </Root>
+        <!--为dao mapper所在的包，level为TRACE-->
+        <Logger name="com.demo.dao" level="TRACE" additivity="false">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="trace_appender"/>
+        </Logger>
+
+        <Logger name="com.demo.mydao" level="TRACE" additivity="false">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="trace_appender"/>
+        </Logger>
+
+        <Logger name="com.demo.redis" level="TRACE" additivity="false">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="trace_appender"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
